@@ -22,23 +22,25 @@ class InputController {
     let isActive = this.isActionActive(actionName)
     if (!isActive) { //не активна
       for (let i = 0; i < this.activityList; i++) {
-        if (this.activityList[i] == actionName) {
+        if (this.activityList[i] === actionName) {
           this.activityList[i].enabled = true;
+          document.dispatchEvent(this.ACTION_ACTIVATED); //генерирует событие активация действия
           this.attach(this.target, isActive);
         }
       }
     }
   }
 
-  disableAction(actionName) {
+  disableAction(actionName) { //Деактивирует объявленную активность - выключает генерацию событий для этой активности.
     for (let i = 0; i < this.activityList; i++) {
-      if (this.activityList[i] == actionName) {
+      if (this.activityList[i] === actionName) {
         this.activityList[i].enabled = false;
       }
     }
   }
 
-  attach(target, dontEnable) { //dontEnable - Если передано true - не активирует контроллер.
+  attach(target, dontEnable) { //dontEnable - Если передано true - не активирует контроллер.Нацеливает контроллер на переданный DOM-элемент (вешает слушатели).
+
     if (!dontEnable) {
       target.fireEvent(this.ACTION_ACTIVATED);
     }
@@ -48,20 +50,21 @@ class InputController {
     this.target.dispatchEvent(this.ACTION_DEACTIVATED);
   }
 
-  isActionActive(action) {
+  isActionActive(action) { //Проверяет активирована ли переданная активность в контроллере
     for (let i = 0; i < this.activityList; i++) {
-      if (this.activityList[i] == actionName) {
+      if (this.activityList[i] === actionName) {
         return this.activityList[i].enabled;
       }
     }
     return false;
   }
 
-  isKeyPressed(keyCode) {
+  isKeyPressed(keyCode) { //Метод для источника ввода клавиатура. Проверяет нажата ли переданная кнопка в контроллере
+
     for (let i = 0; i < this.activityList; i++) {
-      if (this.activityList[i] == actionName) {
+      if (this.activityList[i] === actionName) {
         for (let j = 0; j < this.activityList[i].keys; j++) {
-          if (this.activityList[i].keys[j] == keyCode) return this.activityList[i].enabled;
+          if (this.activityList[i].keys[j] === keyCode) return this.activityList[i].enabled;
         }
       }
     }
