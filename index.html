@@ -1,15 +1,29 @@
 <html>
  <head>
   <title>Интерфейс для контроллера</title>
+  <style>
+    #div-window{
+      width:100;
+      height: 100;
+      background-color: aquamarine;
+    }
+    body{
+      text-align: center;
+    }
+    #conteiner{
+      text-align: center;
+    }
+  </style>
  </head>
  <body>
 <script src="input-controller.js"></script>
-<div>
+<div id="conteiner">
 <button>аттач к элементу DOM</button>
 <button>детач от элемента DOM</button>
 <button>активация контроллера</button>
 <button>деактивация контроллера</button>
 <button>байнд доп. активности “прыжок” на кнопку “пробел”</button>
 </div>
+<div id="div-window" ></div>
  </body>
 </html>

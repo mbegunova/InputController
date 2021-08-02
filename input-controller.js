@@ -4,37 +4,67 @@ class InputController {
   focused; //<bool> Находится ли окно с целью контроллера в фокусе
   ACTION_ACTIVATED = "input-controller:action-activated"; //<string> название события активации активности (одна из кнопок активности нажата)
   ACTION_DEACTIVATED = "input-controller:action-deactivated"; //<string> (одна из кнопок активности отжата)
+  activityList;
+  target;
 
 
   constructor(actionsToBind, target) { //actionsToBind - объект с активностями, target - DOM элемент, на котором слушаем активности
-    target.add
+    this.activityList = actionsToBind;
+    this.target = target;
   }
 
-  bindActions(actionsToBind) {
-
+  bindActions(actionsToBind) { //Добавляет в контроллер переданные активности.
+    this.activityList = actionsToBind;
+    //TODO: добавить собьытия
   }
 
-  enableAction(actionName) {
-
+  enableAction(actionName) {//Включает объявленную активность - включает генерацию событий для этой активности при изменении её статуса. 
+    let isActive = this.isActionActive(actionName)
+    if (!isActive) { //не активна
+      for (let i = 0; i < this.activityList; i++) {
+        if (this.activityList[i] == actionName) {
+          this.activityList[i].enabled = true;
+          this.attach(this.target, isActive);
+        }
+      }
+    }
   }
 
   disableAction(actionName) {
-
+    for (let i = 0; i < this.activityList; i++) {
+      if (this.activityList[i] == actionName) {
+        this.activityList[i].enabled = false;
+      }
+    }
   }
 
   attach(target, dontEnable) { //dontEnable - Если передано true - не активирует контроллер.
-    if (!dontEnable) target.attach
+    if (!dontEnable) {
+      target.fireEvent(this.ACTION_ACTIVATED);
+    }
   }
 
   detach() {
-
+    this.target.dispatchEvent(this.ACTION_DEACTIVATED);
   }
 
   isActionActive(action) {
-    return this.enabled
+    for (let i = 0; i < this.activityList; i++) {
+      if (this.activityList[i] == actionName) {
+        return this.activityList[i].enabled;
+      }
+    }
+    return false;
   }
 
   isKeyPressed(keyCode) {
-
+    for (let i = 0; i < this.activityList; i++) {
+      if (this.activityList[i] == actionName) {
+        for (let j = 0; j < this.activityList[i].keys; j++) {
+          if (this.activityList[i].keys[j] == keyCode) return this.activityList[i].enabled;
+        }
+      }
+    }
+    return false;
   }
 }
