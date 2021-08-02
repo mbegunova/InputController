@@ -40,14 +40,25 @@ class InputController {
   }
 
   attach(target, dontEnable) { //dontEnable - Если передано true - не активирует контроллер.Нацеливает контроллер на переданный DOM-элемент (вешает слушатели).
-
     if (!dontEnable) {
-      target.fireEvent(this.ACTION_ACTIVATED);
+      let myEvent = new CustomEvent(this.ACTION_ACTIVATED, {
+        detail: {},
+        bubbles: true,
+        cancelable: true,
+        composed: false,
+      });
+      document.dispatchEvent(myEvent);
     }
   }
 
   detach() {
-    this.target.dispatchEvent(this.ACTION_DEACTIVATED);
+    let myEvent = new CustomEvent(this.ACTION_ACTIVATED, {
+      detail: {},
+      bubbles: true,
+      cancelable: true,
+      composed: false,
+    });
+    document.dispatchEvent(myEvent);
   }
 
   isActionActive(action) { //Проверяет активирована ли переданная активность в контроллере
@@ -71,3 +82,4 @@ class InputController {
     return false;
   }
 }
+window.InputController = InputController;
