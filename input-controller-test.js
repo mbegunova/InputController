@@ -16,87 +16,74 @@ const activityList = {
   },
 }
 
-let target = document.getElementById('div-window');
-let controller = new InputController(activityList, target);
+
+const target = document.getElementById('div-window');
+const controller = new InputController(activityList, target);
 
 
-let up = 20;
-let left = 20;
+let up = 100;
+let left = 100;
 document.addEventListener(controller.ACTION_ACTIVATED, function (event) { //Активное действие
-  let name = event.detail.action; //получает действие из события
+  const name = event.detail.action; //получает действие из события
   if (controller.isActionActive(name)) { //если оно активно - перемещаем объект
-    debugger
     if (name === "left") {
       left -= 20;
       target.style.left = left;
-      console.log("left");
     }
     else if (name === "right") {
       left += 20;
       target.style.left = left;
-      console.log("right");
     }
     else if (name === "up") {
       up -= 20;
       target.style.top = up;
-      console.log("up");
     }
     else if (name === "down") {
       up += 20;
       target.style.top = up;
-      console.log("down");
+    }
+    else if (name === "jump") {
+      up -= 20;
+      target.style.top = up;
+      up += 20;
+      target.style.top = up;
+      //setTimeout((function () {target.style.top = up;}) => 1000)
     }
   }
 }, false);
 
 
-document.addEventListener(controller.ACTION_DEACTIVATED, function (event) { //Сделать действие не активно
-  document.removeEventListener('keydown', function (e) {
-    let name = getActionName(e);
-    controller.enableAction(name);//передается имя активности
-  })
+document.addEventListener(controller.ACTION_DEACTIVATED, function () { //Сделать действие не активно
+
 }, false);
 
 
-let attach = document.getElementById('attach');
+const attach = document.getElementById('attach');
 attach.onclick = function () {
   controller.attach(target, false);
 };
-let detach = document.getElementById('detach');
+const detach = document.getElementById('detach');
 detach.onclick = function () {
   controller.detach();
 };
-let extraBind = document.getElementById('extra-bind');
+const extraBind = document.getElementById('extra-bind');
 extraBind.onclick = function () {
-  //TODO Добавить активность
+  const extraAction = {
+    "jump": { // название активности
+      keys: [32], // список кодов кнопок соответствующих активности
+    }
+  }
+  controller.bindActions(extraAction);
 };
 
-let activation = document.getElementById('activation'); //активация контроллера
-activation.onclick = function (event) {
-  controller.offed = false;
-  document.addEventListener('keydown', function (e) {
-    let name = getActionName(e);
-    debugger;
-    controller.enableAction(name); //передается имя активности
-  })
-
+const activation = document.getElementById('activation'); //активация контроллера. Дает реацию на события клавиатуры
+activation.onclick = function () {
+  controller.turnON();
 };
 
-let deactivation = document.getElementById('deactivation'); //запретить контр генерировать события
+const deactivation = document.getElementById('deactivation'); //запретить контр генерировать события и реагировать на клавиатуру
 deactivation.onclick = function () {
-  controller.offed = true;
+  controller.turnOFF();
 };
 
-function getActionName(target) { //Возвращает название действия из списка по кнопке(target)
-  let found = "";
-  let list = controller.activityList;
-  Object.entries(list).forEach(([key, value]) => {
-    value.keys.forEach(k => {
-      if (k === target.keyCode) {
-        found = key;
 
-      }
-    });
-  });
-  return found;
-}
