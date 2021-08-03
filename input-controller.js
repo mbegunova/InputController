@@ -6,11 +6,13 @@ class InputController {
   ACTION_DEACTIVATED = "input-controller:action-deactivated"; //<string> (одна из кнопок активности отжата)
   activityList;
   target;
+  offed;//контроллер отключен и перестает обрабатывать событие
 
 
   constructor(actionsToBind, target) { //actionsToBind - объект с активностями, target - DOM элемент, на котором слушаем активности
     this.activityList = actionsToBind;
     this.target = target;
+    this.offed = false;
   }
 
   bindActions(actionsToBind) { //Добавляет в контроллер переданные активности.
@@ -18,68 +20,73 @@ class InputController {
     //TODO: добавить собьытия
   }
 
-  enableAction(actionName) {//Включает объявленную активность - включает генерацию событий для этой активности при изменении её статуса. 
-    let isActive = this.isActionActive(actionName)
+  enableAction(actionName) {//Включает объявленную активность - включает генерацию событий для этой активности при изменении её статуса. Напр. нажатие кнопки
+    if (this.offed) return;
+    let isActive = this.isActionActive(actionName);
     if (!isActive) { //не активна
-      for (let i = 0; i < this.activityList; i++) {
-        if (this.activityList[i] === actionName) {
-          this.activityList[i].enabled = true;
-          document.dispatchEvent(this.ACTION_ACTIVATED); //генерирует событие активация действия
-          this.attach(this.target, isActive);
+      Object.entries(this.activityList).forEach(([key, value]) => {
+        if (key === actionName) {
+          value.enabled = true;
+          let event = new CustomEvent(this.ACTION_ACTIVATED, {
+            detail: { action: actionName }
+          });
+          document.dispatchEvent(event); //генерирует событие активация действия
         }
-      }
+      });
     }
   }
 
-  disableAction(actionName) { //Деактивирует объявленную активность - выключает генерацию событий для этой активности.
-    for (let i = 0; i < this.activityList; i++) {
-      if (this.activityList[i] === actionName) {
-        this.activityList[i].enabled = false;
+  disableAction(actionName) { //Деактивирует объявленную активность - выключает генерацию событий для этой активности. Отжатие кнопки
+    Object.entries(this.activityList).forEach(([key, value]) => {
+      if (key === actionName) {
+        value.enabled = false;
+        let event = new CustomEvent(this.ACTION_DEACTIVATED, {
+          detail: { name: actionName }
+        });
+        document.dispatchEvent(event); //генерирует событие активация действия
       }
-    }
+    });
   }
+
 
   attach(target, dontEnable) { //dontEnable - Если передано true - не активирует контроллер.Нацеливает контроллер на переданный DOM-элемент (вешает слушатели).
     if (!dontEnable) {
-      let myEvent = new CustomEvent(this.ACTION_ACTIVATED, {
-        detail: {},
-        bubbles: true,
-        cancelable: true,
-        composed: false,
-      });
-      document.dispatchEvent(myEvent);
+      this.target = target;
+    }
+    else {
+      target = null;
     }
   }
 
-  detach() {
-    let myEvent = new CustomEvent(this.ACTION_ACTIVATED, {
-      detail: {},
-      bubbles: true,
-      cancelable: true,
-      composed: false,
-    });
-    document.dispatchEvent(myEvent);
+  detach() { //Отцепляет контроллер от активного DOM-элемента и деактивирует контроллер.
+    this.target = null;
+    document.dispatchEvent(this.EVENT_DEACTIVATED);
   }
 
   isActionActive(action) { //Проверяет активирована ли переданная активность в контроллере
-    for (let i = 0; i < this.activityList; i++) {
-      if (this.activityList[i] === actionName) {
-        return this.activityList[i].enabled;
+    let isActive = false;
+    Object.entries(this.activityList).forEach(([key, value]) => {
+      if (key === action) {
+        isActive = value.enabled;
+        return;
       }
-    }
-    return false;
+    });
+    return isActive;
   }
 
   isKeyPressed(keyCode) { //Метод для источника ввода клавиатура. Проверяет нажата ли переданная кнопка в контроллере
-
-    for (let i = 0; i < this.activityList; i++) {
-      if (this.activityList[i] === actionName) {
-        for (let j = 0; j < this.activityList[i].keys; j++) {
-          if (this.activityList[i].keys[j] === keyCode) return this.activityList[i].enabled;
-        }
+    isPassed = false;
+    Object.entries(this.activityList).forEach(([key, value]) => {
+      if (value === actionName) {
+        key.forEach(k => {
+          if (k === keyCode) {
+            isPassed = value.enabled;
+            return;
+          }
+        });
       }
-    }
-    return false;
+    });
+    return isPassed;
   }
 }
 window.InputController = InputController;
