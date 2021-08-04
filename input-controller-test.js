@@ -1,5 +1,6 @@
 const activityList = {
-  "left": { // название активности
+  "left": { // название активности(key)
+    //values:
     keys: [37, 65], // список кодов кнопок соответствующих активности
     enabled: false // отключенная активность
   },
@@ -15,7 +16,6 @@ const activityList = {
     enabled: false // отключенная активность
   },
 }
-
 
 const target = document.getElementById('div-window');
 const controller = new InputController(activityList, target);
@@ -42,12 +42,8 @@ document.addEventListener(controller.ACTION_ACTIVATED, function (event) { //Ак
       up += 20;
       target.style.top = up;
     }
-    else if (name === "jump") {
-      up -= 20;
-      target.style.top = up;
-      up += 20;
-      target.style.top = up;
-      //setTimeout((function () {target.style.top = up;}) => 1000)
+    else if (name === "jump") { //изменение цвета
+      target.style.backgroundColor = target.style.backgroundColor === 'aquamarine' ? 'gold' : 'aquamarine';
     }
   }
 }, false);
@@ -65,6 +61,7 @@ attach.onclick = function () {
 const detach = document.getElementById('detach');
 detach.onclick = function () {
   controller.detach();
+  controller.enabled = false;
 };
 const extraBind = document.getElementById('extra-bind');
 extraBind.onclick = function () {
@@ -78,12 +75,10 @@ extraBind.onclick = function () {
 
 const activation = document.getElementById('activation'); //активация контроллера. Дает реацию на события клавиатуры
 activation.onclick = function () {
-  controller.turnON();
+  controller.enableAction('right');
 };
 
 const deactivation = document.getElementById('deactivation'); //запретить контр генерировать события и реагировать на клавиатуру
 deactivation.onclick = function () {
-  controller.turnOFF();
+  controller.disableAction('right');
 };
-
-
