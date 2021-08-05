@@ -1,0 +1,22 @@
+body{
+	-webkit-overflow-scrolling: touch;
+	@include font( $FONT-BASE );
+}
+
+#object-div {
+  width: 100px;
+  height: 100px;
+  background-color: aquamarine;
+  left: 100px;
+  top: 100px;
+  position: absolute;
+}
+
+body {
+  text-align: center;
+}
+
+#conteiner {
+  padding: 40px;
+  text-align: center;
+}
