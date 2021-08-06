@@ -28,9 +28,9 @@ class InputController {
 
   pluginConnectionCheck(actionName, actionData) {
     const pluginData = pluginsSettings
-      .find(({keys}) => keys.some(key => !!actionData[key])); // кто знает как это обрабатывать?
+      .find(({ keys }) => keys.some(key => !!actionData[key])); // кто знает как это обрабатывать?
     if (pluginData.isUndefined) return;
-    const {pluginClass} = pluginData; //НАШЛИ искомый нами из списка плагинКласс
+    const { pluginClass } = pluginData; //НАШЛИ искомый нами из списка плагинКласс
     if (pluginClass.isUndefined) return;
     const isAdded = this.plugins.some(plugin => plugin instanceof pluginData.pluginClass);
     let plugin; //создаем новый или читаем из свойств контроллера
@@ -43,25 +43,25 @@ class InputController {
     } else {
       plugin = this.plugins[0]; // в какой комнате сидишь - считываем из свойств настройки
     }
-    plugin.addAction({actionName, actionData}) // чел, давай обрабатывай
+    plugin.addAction({ actionName, actionData }) // чел, давай обрабатывай
   }
 
-  onActionChanged({actionName, actionData, active: activity}) {
+  onActionChanged({ actionName, actionData, active: activity }) {
     if (activity.isUndefined) return;
-    const {activityList} = this;
+    const { activityList } = this;
 
     if (this.focused && this.enabled) {
       if (!Object.values(activityList[actionName])[1]) return;
       activityList[actionName].active = !!activity;
-      const event = new CustomEvent(activity ? this.ACTION_ACTIVATED : this.ACTION_DEACTIVATED, {
-        detail: {action: actionName}
+      const event = new CustomEvent(activity ? InputController.ACTION_ACTIVATED : InputController.ACTION_DEACTIVATED, {
+        detail: { action: actionName }
       });
       document.dispatchEvent(event); //генерирует событие активация действия
     }
   }
 
   bindActions(actionsToBind) { //Добавляет в контроллер переданные активности.
-    const {activityList} = this;
+    const { activityList } = this;
     Object.entries(actionsToBind).forEach(([actionName, actionData]) => {
       if (activityList.hasOwnProperty(actionName)) {
         this.mergeActions(activityList[actionName], actionData);
@@ -70,7 +70,6 @@ class InputController {
       }
       this.pluginConnectionCheck(actionName, actionData);
     });
-
   }
 
   mergeActions(target, newAction) { //Изменяет уже имеющиеся действия в actionList
@@ -82,18 +81,18 @@ class InputController {
 
   enableAction(actionName) {//Включает объявленную активность - включает генерацию событий для этой активности при изменении её статуса. Напр. нажатие кнопки
     if (!this.enabled) return;
-        this.setActionEnable(true);
+    this.setActionEnable(actionName, true);
   }
 
   disableAction(actionName) { //Деактивирует объявленную активность - выключает генерацию событий для этой активности. Отжатие кнопки
     if (!this.enabled) return;
-    this.setActionEnable(false);
+    this.setActionEnable(actionName, false);
   }
 
-  setActionEnable(actionName, value){
+  setActionEnable(actionName, enabledValue) {
     Object.entries(this.activityList).forEach(([key, value]) => {
       if (key === actionName) {
-        value.enabled = value;
+        value.enabled = enabledValue;
       }
     });
   }
@@ -123,7 +122,7 @@ class InputController {
   }
 
   isActionActive(action) { //Проверяет активирована ли переданная активность в контроллере
-    const {activityList} = this;
+    const { activityList } = this;
     return (Object.entries(activityList).find(([key,]) => key === action) || [])[1].active || false;
   }
 
