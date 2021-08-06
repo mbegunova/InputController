@@ -2,13 +2,14 @@
 
 export default class PluginKeyboard {
   actionsList;
-  pressedKeyCode;
+  pressedKeyCodes;
 
   constructor({ onActionChanged }) { //передаем функцию в качестве поля класса PluginKeyboard
     this.onActionChanged = onActionChanged;
     document.addEventListener('keydown', this.onkeyHandler);
     document.addEventListener('keyup', this.onkeyHandler);
     this.actionsList = [];
+    this.pressedKeyCodes = [];
   }
 
   destructor() {
@@ -30,11 +31,15 @@ export default class PluginKeyboard {
   }
 
   onkeyHandler = (e)=>{
-    const isDown =  e.type === "keydown"
+    const isDown = e.type === "keydown"
+    const {pressedKeyCodes} = this;
     if (!(typeof (this.onActionChanged) === "function")) return;
-    if(isDown) this.pressedKeyCode = e.keyCode; //запомним нажатую кнопку
+    if(isDown) { //запомним нажатую кнопку
+      if(!this.isKeyPressed(e.keyCode))
+        pressedKeyCodes.push(e.keyCode);
+    }
+    else pressedKeyCodes.splice(pressedKeyCodes.indexOf(e.keyCode), 1);
     const actionObject = this.getActionObject(e);
-    console.log(actionObject.name);
     this.onActionChanged( actionObject, {active: isDown})   // колбек на активацию плагина
   }
 
@@ -44,6 +49,6 @@ export default class PluginKeyboard {
   }
 
   isKeyPressed(keyCode) { //Метод для источника ввода клавиатура. Проверяет нажата ли переданная кнопка в контроллере
-    return keyCode===this.pressedKeyCode;
+    return this.pressedKeyCodes.some(el => el===keyCode);
   }
 }

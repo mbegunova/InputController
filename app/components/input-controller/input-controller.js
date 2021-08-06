@@ -50,7 +50,7 @@ class InputController {
     if (!this.enabled) return;
     const { activityList } = this;
     if (this.focused && this.enabled) {
-      if (!(((activityList[activityList.indexOf(action)]||[]).data||[]).enabled || false)) return;
+      if (!((activityList[activityList.indexOf(action)] || []).data || []).enabled) return;
       activityList[activityList.indexOf(action)].data.active = !!activity;
       const event = new CustomEvent(activity ? InputController.ACTION_ACTIVATED : InputController.ACTION_DEACTIVATED, {
         detail: { action: action.name }
