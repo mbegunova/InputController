@@ -2,51 +2,48 @@
 
 export default class PluginKeyboard {
   actionsList;
+  pressedKeyCode;
 
   constructor({ onActionChanged }) { //передаем функцию в качестве поля класса PluginKeyboard
     this.onActionChanged = onActionChanged;
-    document.addEventListener('keydown', this.onkeyDownHandler);
-    document.addEventListener('keyup', this.onkeyUpHandler);
+    document.addEventListener('keydown', this.onkeyHandler);
+    document.addEventListener('keyup', this.onkeyHandler);
     this.actionsList = [];
   }
 
   destructor() {
-    document.removeEventListener('keydown', this.onkeyDownHandler);
-    document.removeEventListener('keyup', this.onkeyUpHandler);
+    document.removeEventListener('keydown', this.onkeyHandler);
+    document.removeEventListener('keyup', this.onkeyHandler);
   }
 
-  addAction({ actionName, actionData }) {
+  addAction(action) {
     let isChanged = false;
-    Object.entries(this.actionsList).forEach(([k, v]) => {
-      if (v.actionName === actionName) { // 1 == "1" + 1
-        v.actionData = actionData;
+    this.actionsList.forEach((element) => {
+      if (element.actionName === action.name) { // 1 == "1" + 1
+        element.actionData = action.data;
         isChanged = true;
       }
     });
     if (!isChanged) {
-      let action = { actionName, actionData };
-      let a = Object.assign({}, action);
-      this.actionsList.push(a);
+      this.actionsList.push(action);
     }
   }
 
-  onkeyDownHandler = (e) => {
-    if (!typeof (this.onActionChanged) === "function") return;
+  onkeyHandler = (e)=>{
+    const isDown =  e.type === "keydown"
+    if (!(typeof (this.onActionChanged) === "function")) return;
+    if(isDown) this.pressedKeyCode = e.keyCode; //запомним нажатую кнопку
     const actionObject = this.getActionObject(e);
-    const actionName = actionObject[1].actionName || "";
-    const actionData = actionObject[1].actionData || "";
-    this.onActionChanged({ actionData, actionName, active: true })   // колбек на активацию плагина
-  }
-  onkeyUpHandler = (e) => {
-    if (!typeof (this.onActionChanged) === "function") return;
-    const actionObject = this.getActionObject(e);
-    const actionName = actionObject[1].actionName || "";
-    const actionData = actionObject[1].actionData || "";
-    this.onActionChanged({ actionData, actionName, active: false })   // колбек на активацию плагина
+    console.log(actionObject.name);
+    this.onActionChanged( actionObject, {active: isDown})   // колбек на активацию плагина
   }
 
   getActionObject = (btn) => {//Возвращает объект с именем действия и свойствами из списка по коду кнопки
     const { actionsList } = this;
-    return (Object.entries(actionsList).find(([k, v]) => v.actionData.keys.includes(btn.keyCode))) || [];
+    return actionsList.find((action) => action.data.keys.includes(btn.keyCode)) || {};
+  }
+
+  isKeyPressed(keyCode) { //Метод для источника ввода клавиатура. Проверяет нажата ли переданная кнопка в контроллере
+    return keyCode===this.pressedKeyCode;
   }
 }
